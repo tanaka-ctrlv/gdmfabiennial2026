@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Additional Editions</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="landing">
+    <!-- Replace these placeholder URLs with your actual pages. -->
+    <a class="about" href="about.html">About</a>
+
+    <!-- Decorative repetitions are hidden from screen readers. -->
+    <div class="ribbon ribbon--top" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--upper" data-direction="right" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--left" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--right" data-direction="right" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--lower" data-direction="right" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--bottom" aria-hidden="true"><div class="track"></div></div>
+
+    <div class="hero">
+      <h1 class="hero-title">
+        <a href="collection.html" aria-label="Additional Editions — view collection">
+          <span class="word" aria-hidden="true">Additional</span>
+          <span class="word" aria-hidden="true">Editions</span>
+        </a>
+      </h1>
+    </div>
+
+    <a class="collection-link" href="collection.html">View Collection</a>
+  </main>
+
+  <script>
+    // Build two identical groups for each strip so the marquee can loop.
+    document.querySelectorAll('.ribbon .track').forEach((track) => {
+      const group = document.createElement('span');
+      group.className = 'group';
+
+      for (let i = 0; i < 3; i++) {
+        const phrase = document.createElement('span');
+        phrase.className = 'phrase';
+        phrase.innerHTML = '<span class="word">Additional</span><span class="word">Editions</span>';
+        group.append(phrase);
+      }
+
+      track.append(group, group.cloneNode(true));
+    });
+
+    // Increase or decrease these values to tune the hover response.
+    const WAVE_RADIUS = 1.6;
+    const CENTER_SQUEEZE = .9;
+    const SIDE_STRETCH = 1.2;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!reduceMotion.matches) {
+      document.fonts.ready.then(() => {
+        document.querySelectorAll('.word').forEach((word) => {
+          const letters = [...word.textContent].map((character) => {
+            const letter = document.createElement('span');
+            const glyph = document.createElement('span');
+
+            letter.className = 'letter';
+            glyph.className = 'glyph';
+            glyph.textContent = character;
+            letter.append(glyph);
+
+            return letter;
+          });
+
+          word.replaceChildren(...letters);
+
+          const measure = () => {
+            letters.forEach((letter) => {
+              letter.style.width = '';
+              letter.firstElementChild.style.width = '';
+              letter.firstElementChild.style.transform = '';
+            });
+
+            letters.forEach((letter) => {
+              const glyph = letter.firstElementChild;
+              const width = glyph.getBoundingClientRect().width;
+
+              letter.dataset.base = width;
+              letter.style.width = `${width}px`;
+              glyph.style.width = `${width}px`;
+            });
+          };
+
+          measure();
+          window.addEventListener('resize', measure);
+
+          word.addEventListener('pointermove', (event) => {
+            const radius =
+              parseFloat(getComputedStyle(word).fontSize) * WAVE_RADIUS;
+
+            const centers = letters.map((letter) => {
+              const box = letter.getBoundingClientRect();
+              return box.left + box.width / 2;
+            });
+
+            letters.forEach((letter, index) => {
+              const distance =
+                Math.abs(event.clientX - centers[index]) / radius;
+
+              const squeeze =
+                Math.exp(-Math.pow(distance / .32, 2));
+
+              const stretch =
+                Math.exp(-Math.pow((distance - .72) / .48, 2));
+
+              const scale = Math.max(
+                .18,
+                Math.min(
+                  2.3,
+                  1 - CENTER_SQUEEZE * squeeze + SIDE_STRETCH * stretch
+                )
+              );
+
+              const base = Number(letter.dataset.base);
+
+              letter.style.width = `${base * scale}px`;
+              letter.firstElementChild.style.transform = `scaleX(${scale})`;
+            });
+          });
+
+          word.addEventListener('pointerleave', () => {
+            letters.forEach((letter) => {
+              letter.style.width = `${letter.dataset.base}px`;
+              letter.firstElementChild.style.transform = 'scaleX(1)';
+            });
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>

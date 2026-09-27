@@ -1,0 +1,277 @@
+@font-face {
+  font-family: "Additional Editions";
+  src: url("./Fonts/AdditionalEditions-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --paper: #fff;
+  --ink: #080808;
+  --display-font: "Additional Editions", "Arial Narrow", Impact, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); }
+a { color: inherit; }
+
+.landing {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--paper);
+}
+
+.about {
+  position: absolute;
+  z-index: 4;
+  top: clamp(1.5rem, 4vw, 3.25rem);
+  right: clamp(1.5rem, 7vw, 9rem);
+  font: 1.1rem/1.2 Georgia, serif;
+  text-decoration: none;
+}
+
+.about:hover,
+.about:focus-visible,
+.collection-link:hover,
+.collection-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* The central title stays still while its letters respond to the cursor. */
+.hero {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.hero-title {
+  margin: -2vh 0 0;
+  max-width: 94vw;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: var(--display-font);
+  font-size: clamp(3.5rem, 14vw, 17rem);
+  font-weight: 400;
+  font-synthesis-weight: none;
+  line-height: .88;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.hero-title a {
+  display: block;
+  padding: .08em .12em;
+  background: var(--paper);
+  text-decoration: none;
+}
+
+.hero-title .word { display: block; }
+.hero-title .word + .word { margin-top: .09em; }
+
+/* Staggered ribbons form courses of larger and smaller type. */
+.ribbon {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: rotate(var(--angle, 0deg));
+  font-family: var(--display-font);
+  font-size: var(--type-size, clamp(4rem, 10.5vw, 12rem));
+  font-weight: 400;
+  line-height: 1;
+  font-synthesis-weight: none;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: travel var(--speed, 30s) linear infinite;
+  will-change: transform;
+}
+
+.ribbon[data-direction="right"] .track {
+  animation-direction: reverse;
+}
+
+.ribbon:hover .track {
+  animation-play-state: paused;
+}
+
+.group {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.phrase {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .22em;
+  padding-right: .48em;
+}
+
+/* Change --type-size for each row; --offset controls its stagger. */
+.ribbon--top {
+  top: -3%;
+  left: 0;
+  width: 100%;
+  --type-size: clamp(5rem, 11vw, 13rem);
+  --offset: -4vw;
+  --angle: 0deg;
+  --speed: 36s;
+}
+
+.ribbon--upper {
+  top: 17%;
+  left: 0;
+  width: 100%;
+  --type-size: clamp(4rem, 8vw, 9.5rem);
+  --offset: -32vw;
+  --angle: 0deg;
+  --speed: 29s;
+}
+
+.ribbon--left {
+  top: 42%;
+  left: -10%;
+  width: 36%;
+  --type-size: clamp(4.5rem, 9.5vw, 11rem);
+  --offset: -6vw;
+  --angle: 0deg;
+  --speed: 34s;
+}
+
+.ribbon--right {
+  top: 48%;
+  left: 78%;
+  width: 34%;
+  --type-size: clamp(5rem, 12vw, 14rem);
+  --offset: -22vw;
+  --angle: 0deg;
+  --speed: 40s;
+}
+
+.ribbon--lower {
+  top: 72%;
+  left: 0;
+  width: 100%;
+  --type-size: clamp(4.5rem, 10vw, 12rem);
+  --offset: -30vw;
+  --angle: 0deg;
+  --speed: 31s;
+}
+
+.ribbon--bottom {
+  top: 89%;
+  left: 0;
+  width: 100%;
+  --type-size: clamp(3.5rem, 7vw, 8.5rem);
+  --offset: -5vw;
+  --angle: 0deg;
+  --speed: 37s;
+}
+
+@keyframes travel {
+  from { transform: translateX(var(--offset, 0px)); }
+  to { transform: translateX(calc(-50% + var(--offset, 0px))); }
+}
+
+/* Changing each letter's width moves its neighboring letters too. */
+.word {
+  display: inline-flex;
+  align-items: baseline;
+  cursor: pointer;
+}
+
+.letter {
+  display: inline-block;
+  flex: none;
+  transition: width .44s cubic-bezier(.18, .72, .19, 1.04);
+}
+
+.glyph {
+  display: inline-block;
+  white-space: pre;
+  transform-origin: left center;
+  transition: transform .44s cubic-bezier(.18, .72, .19, 1.04);
+}
+
+.collection-link {
+  position: absolute;
+  z-index: 4;
+  bottom: clamp(1.8rem, 5vw, 4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font: 1.1rem/1.2 Georgia, serif;
+  padding: .2rem .75rem;
+  background: var(--paper);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.collection-link::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + .65rem);
+  left: 50%;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+@media (max-width: 650px) {
+  .ribbon--top {
+    top: 10%;
+    left: 0;
+    width: 100%;
+    --type-size: clamp(3.5rem, 17vw, 6.5rem);
+  }
+
+  .ribbon--upper,
+  .ribbon--left,
+  .ribbon--right {
+    display: none;
+  }
+
+  .ribbon--lower {
+    top: 70%;
+    left: 0;
+    width: 100%;
+    --type-size: clamp(3rem, 13vw, 5.5rem);
+  }
+
+  .ribbon--bottom {
+    top: 84%;
+    left: 0;
+    width: 100%;
+    --type-size: clamp(3.25rem, 15vw, 6rem);
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 13vw, 6rem);
+  }
+
+  .about {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .track { animation: none !important; }
+  .letter, .glyph { transition: none; }
+}
