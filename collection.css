@@ -96,6 +96,7 @@
   .guide.hz { left: 0; right: 0; top: 50%; height: 1px; }
   .guide.on { display: block; }
   #strip { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; display: flex; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; scrollbar-width: thin; background: #000; }
+  #strip { border-bottom: 1px solid #fff; }
   #strip .thumb { flex: 0 0 auto; width: 64px; height: 46px; box-sizing: border-box; border: 1px solid #111; margin-left: -1px; background: #d9d9d9; position: relative; cursor: grab; padding: 0; touch-action: pan-x; }
   #strip .thumb:first-child { margin-left: 0; }
   #strip .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none; }
