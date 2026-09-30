@@ -38,6 +38,7 @@
   #label .a { align-self: start; justify-self: end; font-size: 22px; line-height: 1; margin-top: 6px; white-space: nowrap; padding: .08em .3em .04em; }
 
   /* bottom title bar */
+  #bar, #mnav { border-top: 1px solid #fff; }
   #bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: #000; display: flex; overflow: hidden; padding-bottom: env(safe-area-inset-bottom, 0px); }
   #bar .cell { position: relative; overflow: hidden; flex: 0 0 auto; background: var(--bb, #000); color: var(--bi, #fff); border: 0; border-left: 1px solid #fff; padding: 0 clamp(10px, 1.6vw, 26px); height: var(--barH); display: flex; align-items: center; font: inherit; font-size: clamp(12px, 1.45vw, 22px); letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; line-height: 1; text-decoration: none; cursor: pointer; transition: background-color .2s ease, color .12s ease; }
   #bar .cell:first-child { border-left: 0; }
