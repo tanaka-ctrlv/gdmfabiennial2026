@@ -206,7 +206,7 @@
     .g-meta span { display: block; }
     .g-meta span + span { margin-top: 4px; }
     #gCount { justify-self: start; align-self: start; margin: 16px 0 0; }
-    #gDesc { width: 100%; max-width: none; min-width: 0; max-height: none; overflow: visible; margin-top: 20px; font-size: 15px; }
+    #gDesc { width: 100%; max-width: none; min-width: 0; max-height: none; overflow: visible; margin-top: 36px; font-size: 15px; }
     #gDesc.more { -webkit-mask-image: none; mask-image: none; }
     .g-tools { justify-self: end; align-self: start; margin-top: 16px; gap: 8px; justify-items: end; }
     .g-tools button { font-size: 13px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
