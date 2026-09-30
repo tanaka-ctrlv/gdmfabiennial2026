@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<base href="../">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About — Additional Editions</title>
+<link rel="stylesheet" href="collection.css">
+</head>
+<body>
+
+<canvas id="cv" aria-hidden="true"></canvas>
+<div id="label" aria-hidden="true"><span class="t"></span><span class="a"></span></div>
+<div id="tab" aria-hidden="true"></div>
+<div id="cur" class="outline" aria-hidden="true"></div>
+
+<nav id="bar" aria-label="Site">
+  <button class="cell active" id="bIndex" type="button"><span>Index</span></button>
+  <button class="cell" id="bAbout" type="button"><span>About</span></button>
+  <button class="cell" id="bPortal" type="button"><span id="portalLabel">Drawing Portal</span></button>
+  <div class="cell spacer" aria-hidden="true"></div>
+  <a class="cell logo" id="bLogo" href="./"><span>Additional Editions</span></a>
+</nav>
+
+<nav id="mnav" aria-label="Site menu">
+  <div id="mlist">
+    <a class="logo" href="./">Additional Editions</a>
+    <button type="button" data-act="index" id="mIndex">Index</button>
+    <button type="button" data-act="about" id="mAbout">About</button>
+    <button type="button" data-act="portal" id="mPortal">Drawing Portal</button>
+    <button type="button" data-act="close">Close</button>
+  </div>
+  <button type="button" id="mMenuBtn" aria-expanded="false">Menu</button>
+</nav>
+<div id="mcatch" aria-hidden="true"></div>
+
+<section id="poster" aria-label="Poster portal">
+  <div id="posterActions"><button id="saveImg" type="button">Save image</button><button id="printMe" type="button">Print me</button></div>
+  <div id="sheets" aria-hidden="true"></div>
+  <div id="paper">
+    <div id="pclip"></div>
+    <div id="pui"><div class="guide v" id="gV"></div><div class="guide hz" id="gH"></div></div>
+  </div>
+  <div id="strip" role="list" aria-label="Saved images. Drag onto the poster, or tap to place."></div>
+</section>
+<div id="ghost" aria-hidden="true"></div>
+
+<div id="pieceList" class="sr" role="list" aria-label="Submissions"></div>
+
+<section id="gallery" aria-labelledby="gTitle">
+  <div class="g-head outline">
+    <h1 id="gTitle" class="outline"></h1>
+    <span id="gArtist"></span>
+    <div class="g-meta"><span id="gDate"></span><span id="gMedium"></span></div>
+  </div>
+  <div class="g-tools outline">
+    <button id="add" type="button"><span class="t">Add to poster stack</span></button>
+    <button id="clear" type="button"><span class="t">Clear stack</span></button>
+  </div>
+  <div id="gCount" class="outline" aria-live="polite"></div>
+  <div class="g-stage" id="stage">
+    <div class="g-frame" id="frame"></div>
+    <button class="sr" id="prevI" type="button">Previous image</button>
+    <button class="sr" id="nextI" type="button">Next image</button>
+  </div>
+  <div id="gDesc" class="outline"></div>
+</section>
+
+<section id="about" aria-label="About">
+  <div id="aboutBg" aria-hidden="true">
+    <div class="ribbon" style="top:2%;--type-size:min(11vw, 15vh);--offset:-6vw;--speed:80s"><div class="track"></div></div>
+    <div class="ribbon" style="top:37%;--type-size:min(11vw, 15vh);--offset:-30vw;--speed:72s" data-direction="right"><div class="track"></div></div>
+    <div class="ribbon" style="top:72%;--type-size:min(11vw, 15vh);--offset:-16vw;--speed:86s"><div class="track"></div></div>
+  </div>
+  <div class="a-inner" id="aboutScroll">
+    <div class="a-copy">
+      <h2>Additional Editions</h2>
+      <p>Graphic design is always representational — a file on a hard drive, a print, a series of instructions in code, form or language. Multiplicity is baked into the origins of our field; from the printing presses that established it as a profession, design has always thrived on dissemination, sharing, and redistribution.</p>
+      <p>The traditional gallery’s function is to show individual original artworks. But graphic design doesn’t fit this environment — when it remains singular, it shrinks from its purpose. In a medium intended to communicate, reproductions are louder and go farther.</p>
+      <p>With this exhibit, we create conditions for graphic design to travel. From this point of departure, the work moves outward through copies and editions made to circulate. It can be collected, shared, carried, passed on, displayed, reproduced, and placed in new contexts by the people who encounter it.</p>
+    </div>
+    <div class="a-info">
+      <h3>Location</h3>
+      <p><a class="plain" href="https://www.risd.edu/academics/campus-resources/sol-koffler-graduate-student-gallery" target="_blank" rel="noopener">Sol Koffler Graduate Student Gallery</a><br>169 Weybosset Street, 1st floor<br>Providence, RI</p>
+      <h3>Opening Reception</h3>
+      <p>Oct 1, 7–9 pm</p>
+      <h3>Gallery Hours</h3>
+      <p>October 2nd to 18th<br>Daily, noon–5 pm</p>
+    </div>
+  </div>
+</section>
+
+<div id="controls" hidden>
+  <h2><span>Stack controls</span><span>C</span></h2>
+  <div class="row"><label for="cExpand">Hover height px</label><output id="oExpand"></output><input id="cExpand" type="range" min="20" max="160" step="1"></div>
+  <div class="row"><label for="cRag">Band edge raggedness px</label><output id="oRag"></output><input id="cRag" type="range" min="0" max="8" step="0.2"></div>
+  <div class="row"><label for="cRow">Raggedness row px</label><output id="oRow"></output><input id="cRow" type="range" min="1" max="6" step="1"></div>
+  <div class="row"><label for="cMis">Block misalign px</label><output id="oMis"></output><input id="cMis" type="range" min="0" max="30" step="1"></div>
+  <div class="row"><label for="cDrift">Band drift</label><output id="oDrift"></output><input id="cDrift" type="range" min="0" max="3" step="0.1"></div>
+  <div class="btns"><button id="bSeed" type="button">Reshuffle bands</button><button id="bCopy" type="button">Copy saved</button></div>
+  <label class="folder">Load HI RES PHOTOS folder<input id="folder" type="file" webkitdirectory multiple></label>
+  <div class="btns"><button id="bClear" type="button">Clear saved</button><button id="bHide" type="button">Hide</button></div>
+  <div id="toast" aria-live="polite"></div>
+</div>
+
+<script src="collection.js?v=clean-urls"></script>
+
+</body>
+</html>
