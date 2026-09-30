@@ -69,7 +69,7 @@ let localFiles = new Map();
 let saved = [];              // poster queue: one entry per "Add to poster"
 let uidSeq = 1;
 
-function colW() { return clamp(Math.round(W * 0.065), 48, 96); }
+function colW() { return W <= 700 ? 38 : clamp(Math.round(W * 0.065), 48, 96); }
 const mctx = document.createElement("canvas").getContext("2d");
 function tabGeom(p) {
   const fs = clamp(p.h * 0.42, 11, 15), bh = Math.round(fs * 1.2), pad = fs * 0.35;
