@@ -215,7 +215,7 @@
     #label { grid-template-columns: minmax(0, 1fr) auto; column-gap: 6px; padding: 0 6px; }
     #label .t { white-space: normal; overflow: hidden; text-overflow: clip; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.02; }
     #label .a { justify-self: end; margin: 4px 0 0; font-size: 13px !important; }
-    #strip { bottom: 10px; }
+    #strip { bottom: 0; }
     #strip { height: 54px; } #strip .thumb { width: 72px; height: 54px; }
   }
   @media (prefers-reduced-motion: reduce) {
