@@ -545,6 +545,7 @@ const WM_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAwcAAAElCAYAAACxo5
 const X_DARK = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="0" x2="100" y2="100" stroke="#111" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="100" y1="0" x2="0" y2="100" stroke="#111" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>';
 let poster = { items: [], wm: { x: 0.5, y: 0.84, w: 0.62 } };
 let psel = null, pid = 1, hist = [], redoStack = [];
+let posterClipboard = null;
 let PW = 0, PH = 0;                      // paper size on screen, px
 const aspects = new Map();               // file -> natural w/h
 
@@ -744,8 +745,34 @@ paperEl.addEventListener("pointermove", e => {
 function endOp(e) { if (!op || (e && e.pointerId !== op.id)) return; const changed = op.pushed; op = null; gV.classList.remove("on"); gH.classList.remove("on"); if (changed) savePoster(); }
 paperEl.addEventListener("pointerup", endOp); paperEl.addEventListener("pointercancel", endOp);
 
+function copyPosterItem() {
+  const it = getSel();
+  if (!it || psel === "wm") return;
+  posterClipboard = { ...it };
+}
+function pastePosterItem() {
+  if (!posterClipboard) return;
+  const selected = psel !== "wm" && getSel();
+  const anchor = selected || posterClipboard;
+  const copy = { ...posterClipboard, id: pid++ };
+  const extent = it => {
+    const angle = (it.rot || 0) * Math.PI / 180;
+    return Math.abs(Math.cos(angle)) * it.w / 2 + Math.abs(Math.sin(angle)) * it.h * PH / PW / 2;
+  };
+  const half = extent(copy), distance = extent(anchor) + half + 12 / PW;
+  copy.x = anchor.x + distance;
+  if (copy.x + half > 1) copy.x = anchor.x - distance;
+  if (copy.x - half < 0) copy.x = Math.max(half, Math.min(1 - half, anchor.x + 12 / PW));
+  copy.y = anchor.y;
+  pushHist();
+  poster.items.push(copy); psel = copy.id;
+  renderPoster(); savePoster();
+}
 function posterKey(e) {
+  if (e.target.closest("input, textarea, [contenteditable]")) return;
   const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key.toLowerCase() === "c" && psel !== "wm" && getSel()) { e.preventDefault(); copyPosterItem(); return; }
+  if (mod && e.key.toLowerCase() === "v" && posterClipboard) { e.preventDefault(); pastePosterItem(); return; }
   if (mod && (e.key === "z" || e.key === "Z")) { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if (mod && (e.key === "y" || e.key === "Y")) { e.preventDefault(); redo(); return; }
   if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSel(); return; }
