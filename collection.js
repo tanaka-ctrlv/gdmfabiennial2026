@@ -313,6 +313,7 @@ function srcFor(name) { const n = name.normalize("NFC"); return localFiles.get(n
 function placeholder(name) { const d = document.createElement("div"); d.className = "ph"; d.innerHTML = X_SVG + "<span></span>"; d.querySelector("span").textContent = name; return d; }
 
 function fillGallery() {
+  gal.scrollTop = 0;
   const p = pieces[sel];
   document.getElementById("gTitle").textContent = p.title;
   document.getElementById("gArtist").textContent = p.artist;

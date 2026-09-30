@@ -197,8 +197,8 @@
   #toast { color: #fff; min-height: 1em; font-size: 13px; }
 
   @media (max-width: 700px) {
-    #gallery { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 56vh auto; grid-template-areas: "head count" "stage stage" "desc tools";
-      column-gap: 14px; padding: calc(48px + env(safe-area-inset-top, 0px)) 16px 28px 0; overflow-y: auto; align-content: start; }
+    #gallery { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: max-content 56vh max-content; grid-template-areas: "head count" "stage stage" "desc tools";
+      column-gap: 14px; padding: calc(48px + env(safe-area-inset-top, 0px)) 16px 28px 0; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; overscroll-behavior-y: contain; box-sizing: border-box; align-content: start; }
     .g-head { padding-bottom: 18px; }
     #gTitle { font-size: 30px; }
     #gArtist { margin-top: 8px; font-size: 18px; }
@@ -206,7 +206,8 @@
     .g-meta span { display: inline; }
     .g-meta span + span { margin-top: 0; }
     #gCount { margin: 0 0 18px; }
-    #gDesc { max-height: none; margin-top: 16px; font-size: 15px; }
+    #gDesc { max-height: none; overflow: visible; margin-top: 16px; font-size: 15px; }
+    #gDesc.more { -webkit-mask-image: none; mask-image: none; }
     .g-tools { align-self: start; margin-top: 16px; gap: 8px; }
     .g-tools button { font-size: 13px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
     .a-inner { grid-template-columns: 1fr; }
