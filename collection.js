@@ -298,7 +298,7 @@ async function openAbout() {
   if (aboutOpen) aboutEl.classList.add("on");
 }
 function closeAbout() {
-  if (location.pathname.endsWith("/about.html")) { location.assign("index.html"); return; }
+  if (location.pathname.endsWith("/about.html")) { location.assign("stack.html"); return; }
   if (!aboutOpen) return;
   aboutOpen = false; aboutEl.classList.remove("on"); setActive();
   aboutScroll.scrollTop = 0;
@@ -468,7 +468,7 @@ async function goAbout() {
   else if (mode === "gallery") { await closeGallery(); openAbout(); }
   else if (mode === "stack") openAbout();
 }
-document.getElementById("bIndex").onclick = () => location.assign("index.html");
+document.getElementById("bIndex").onclick = () => location.assign("stack.html");
 document.getElementById("bAbout").onclick = () => location.assign("about.html");
 document.getElementById("bPortal").onclick = () => location.assign("drawing.html");
 
@@ -480,7 +480,7 @@ document.getElementById("mcatch").addEventListener("pointerdown", e => { e.preve
 document.getElementById("mlist").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const act = b.dataset.act; closeMobileMenu();
-  if (act === "index") location.assign("index.html"); else if (act === "about") location.assign("about.html"); else if (act === "portal") location.assign("drawing.html");
+  if (act === "index") location.assign("stack.html"); else if (act === "about") location.assign("about.html"); else if (act === "portal") location.assign("drawing.html");
 });
 
 /* ---------- about background ribbons (decorative, non-interactive) ---------- */
@@ -814,7 +814,7 @@ async function goPoster() {
   setPortalLabel("Poster Portal"); mode = "poster"; setActive();
 }
 async function leavePoster() {
-  if (location.pathname.endsWith("/drawing.html")) { location.assign("index.html"); return; }
+  if (location.pathname.endsWith("/drawing.html")) { location.assign("stack.html"); return; }
   if (mode !== "poster") return;
   mode = "busy"; psel = null; renderPoster(); posterEl.classList.remove("on");
   await tween("poster", 0, 320);
