@@ -552,7 +552,7 @@ const aspects = new Map();               // file -> natural w/h
 function loadPoster() {
   try { const s = JSON.parse(localStorage.getItem("biennial-poster") || "null"); if (s && s.items && s.wm) { poster = s; pid = s.items.reduce((m, it) => Math.max(m, it.id + 1), 1); } } catch {}
 }
-function savePoster() { try { localStorage.setItem("biennial-poster", JSON.stringify(poster)); } catch {} }
+function savePoster() { constrainWatermark(); try { localStorage.setItem("biennial-poster", JSON.stringify(poster)); } catch {} }
 function snapshot() { return JSON.stringify(poster); }
 function pushHist() { hist.push(snapshot()); if (hist.length > 150) hist.shift(); redoStack = []; }
 function undo() { if (!hist.length) return; redoStack.push(snapshot()); poster = JSON.parse(hist.pop()); if (psel !== "wm" && !poster.items.some(i => i.id === psel)) psel = null; renderPoster(); savePoster(); }
@@ -626,8 +626,20 @@ function place(el, it, h) {
   Object.assign(el.style, s); Object.assign(el._content.style, s);
   el.style.setProperty("--r", (it.rot || 0) + "deg");
 }
+function constrainWatermark() {
+  const it = poster.wm, ratio = 8.5 / 11;
+  const angle = (it.rot || 0) * Math.PI / 180;
+  const c = Math.abs(Math.cos(angle)), s = Math.abs(Math.sin(angle));
+  let width = it.w * (c + s * WM_ASPECT);
+  let height = it.w * ratio * (s + c * WM_ASPECT);
+  const scale = Math.min(1, 1 / width, 1 / height);
+  it.w *= scale; width *= scale; height *= scale;
+  it.x = clamp(it.x, width / 2, 1 - width / 2);
+  it.y = clamp(it.y, height / 2, 1 - height / 2);
+}
 function wmH() { return poster.wm.w * WM_ASPECT * (8.5 / 11); }
 function renderPoster() {
+  constrainWatermark();
   const keep = new Set(["wm", ...poster.items.map(i => String(i.id))]);
   pui.querySelectorAll(".pitem").forEach(el => { if (!keep.has(el.dataset.key)) { el._content.remove(); el.remove(); } });
   const wm = itemEl("wm", true); place(wm, poster.wm, wmH()); wm.style.zIndex = wm._content.style.zIndex = 0; wm.classList.toggle("sel", psel === "wm");
