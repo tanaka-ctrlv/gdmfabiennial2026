@@ -385,7 +385,7 @@ async function closeGallery() {
   tween("savedVis", 0, 260);
   await tween("jut", 0, 220);
   tabEl.classList.remove("on");
-  setPortalLabel("Drawing Portal");
+  setPortalLabel("Poster Portal");
   await tween("col", 0, 520);
   const last = sel; sel = -1;
   V.fill = V.fillT = 1; dirty = true;                // reset the stack
@@ -470,7 +470,7 @@ async function goAbout() {
 }
 document.getElementById("bIndex").onclick = () => location.assign("index/");
 document.getElementById("bAbout").onclick = () => location.assign("about/");
-document.getElementById("bPortal").onclick = () => location.assign("drawing/");
+document.getElementById("bPortal").onclick = () => location.assign("poster-portal/");
 
 /* mobile menu: pops up, shrinks when you tap off it */
 const mnav = document.getElementById("mnav"), mBtn = document.getElementById("mMenuBtn");
@@ -480,7 +480,7 @@ document.getElementById("mcatch").addEventListener("pointerdown", e => { e.preve
 document.getElementById("mlist").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const act = b.dataset.act; closeMobileMenu();
-  if (act === "index") location.assign("index/"); else if (act === "about") location.assign("about/"); else if (act === "portal") location.assign("drawing/");
+  if (act === "index") location.assign("index/"); else if (act === "about") location.assign("about/"); else if (act === "portal") location.assign("poster-portal/");
 });
 
 /* ---------- about background ribbons (decorative, non-interactive) ---------- */
@@ -814,11 +814,11 @@ async function goPoster() {
   setPortalLabel("Poster Portal"); mode = "poster"; setActive();
 }
 async function leavePoster() {
-  if (/\/drawing(?:\/|\/index\.html)?$/.test(location.pathname)) { location.assign("index/"); return; }
+  if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) { location.assign("index/"); return; }
   if (mode !== "poster") return;
   mode = "busy"; psel = null; renderPoster(); posterEl.classList.remove("on");
   await tween("poster", 0, 320);
-  setPortalLabel("Drawing Portal"); mode = "stack"; setActive();
+  setPortalLabel("Poster Portal"); mode = "stack"; setActive();
 }
 window.biennial.poster = () => JSON.parse(JSON.stringify(poster));
 loadPoster();
@@ -837,5 +837,5 @@ function resize() {
 addEventListener("resize", resize);
 resize(); restore(); setActive();
 if (/\/about(?:\/|\/index\.html)?$/.test(location.pathname) || location.hash === "#about") openAbout();
-if (/\/drawing(?:\/|\/index\.html)?$/.test(location.pathname)) goPoster();
+if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) goPoster();
 requestAnimationFrame(render);
