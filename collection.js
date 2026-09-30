@@ -421,9 +421,12 @@ function addCurrent() {
   saved.push({ uid, no: p.no, artist: p.artist, title: p.title, file: f, posterFile, fileIndex: imgIdx,
     src: IMAGE_DIR + p.files[imgIdx], color: p.colors[0], paper: p.paper, colors: p.colors,
     savedAt: new Date().toISOString(), t0: performance.now() });
+  const currentImage = frame.querySelector("img");
+  if (posterFile === f && currentImage && currentImage.naturalWidth) aspects.set(posterFile, currentImage.naturalWidth / currentImage.naturalHeight);
+  addItem(posterFile, 0.5, 0.42);
   persist(); dirty = true;
   const b = document.getElementById("add"); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse");
-  flash(`Saved ${saved.length}`);
+  flash("Added to poster");
 }
 function clearSaved() { saved = []; persist(); dirty = true; flash("Stack cleared"); }
 document.getElementById("add").onclick = addCurrent;
@@ -577,7 +580,7 @@ function contentFor(file, dark) {
 }
 function buildStrip() {
   stripEl.innerHTML = "";
-  const list = uniqueSaved();
+  const list = pieces.map(p => ({ title: p.title, artist: p.artist, file: p.still && (VID.test(p.files[0]) || /\.gif$/i.test(p.files[0])) ? p.still : p.files[0] }));
   if (!list.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "Nothing saved yet. Open a work and press Add to poster."; stripEl.append(e); return; }
   list.forEach(s => {
     const b = document.createElement("button"); b.type = "button"; b.className = "thumb"; b.setAttribute("role", "listitem");
@@ -586,6 +589,7 @@ function buildStrip() {
     else b.innerHTML = X_DARK;
     stripEl.append(b);
   });
+  requestAnimationFrame(updateStripArrows);
 }
 function layoutPaper() {
   const top = mobileMQ.matches ? 52 : 44, bottom = (stripEl.offsetHeight || 46) + (mobileMQ.matches ? 34 : 22), side = mobileMQ.matches ? 16 : 70, stackOff = mobileMQ.matches ? 18 : 62;
@@ -651,8 +655,8 @@ function renderPoster() {
 }
 function addItem(file, fx, fy) {
   const a = aspects.get(file) || 0.8;
-  let w = 0.34, h = (w * PW / a) / PH;
-  if (h > 0.5) { h = 0.5; w = (h * PH * a) / PW; }
+  let w = 0.34, h = w * (8.5 / 11) / a;
+  if (h > 0.5) { h = 0.5; w = h * a / (8.5 / 11); }
   pushHist();
   const it = { id: pid++, file, x: clamp(fx, w / 2, 1 - w / 2), y: clamp(fy, h / 2, 1 - h / 2), w, h, rot: 0 };
   poster.items.push(it); psel = it.id; renderPoster(); savePoster();
@@ -662,6 +666,22 @@ function deleteSel() {
   pushHist(); poster.items = poster.items.filter(i => i.id !== psel); psel = null; renderPoster(); savePoster();
 }
 function getSel() { return psel === "wm" ? poster.wm : poster.items.find(i => i.id === psel); }
+
+const stripPrev = document.getElementById("stripPrev"), stripNext = document.getElementById("stripNext");
+function updateStripArrows() {
+  const end = Math.max(0, stripEl.scrollWidth - stripEl.clientWidth);
+  const atStart = stripEl.scrollLeft <= 1, atEnd = stripEl.scrollLeft >= end - 1;
+  stripPrev.classList.toggle("off", atStart); stripPrev.disabled = atStart;
+  stripNext.classList.toggle("off", atEnd); stripNext.disabled = atEnd;
+}
+stripEl.addEventListener("scroll", updateStripArrows, { passive: true });
+new ResizeObserver(updateStripArrows).observe(stripEl);
+stripPrev.onclick = () => stripEl.scrollBy({ left: -Math.max(64, stripEl.clientWidth * .75), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+stripNext.onclick = () => stripEl.scrollBy({ left: Math.max(64, stripEl.clientWidth * .75), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+stripEl.addEventListener("keydown", e => {
+  const button = e.target.closest(".thumb");
+  if (button && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); addItem(button.dataset.file, .5, .42); }
+});
 
 /* ---- dragging thumbnails from the strip ---- */
 let tdrag = null;

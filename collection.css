@@ -95,7 +95,7 @@
   .guide.v { top: 0; bottom: 0; left: 50%; width: 1px; }
   .guide.hz { left: 0; right: 0; top: 50%; height: 1px; }
   .guide.on { display: block; }
-  #strip { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; display: flex; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; scrollbar-width: thin; background: #000; }
+  #strip { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; display: flex; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; scrollbar-width: none; background: #000; }
   #strip { border-bottom: 1px solid #fff; }
   #strip .thumb { flex: 0 0 auto; width: 64px; height: 46px; box-sizing: border-box; border: 1px solid #111; margin-left: -1px; background: #d9d9d9; position: relative; cursor: grab; padding: 0; touch-action: pan-x; }
   #strip .thumb:first-child { margin-left: 0; }
@@ -225,3 +225,14 @@
     .track, .glyph { animation: none !important; }
     #poster, #mlist { transition: none; }
   }
+
+  #strip::-webkit-scrollbar { display: none; }
+  #poster { overflow: hidden; --strip-height: 46px; }
+  .strip-arrow { position: absolute; bottom: 0; height: var(--strip-height); width: 46px; z-index: 4; background: #000; color: #fff; border: 0; border-top: 1px solid #fff; border-bottom: 1px solid #fff; padding: 0; font: 26px/1 sans-serif; cursor: pointer; transition: transform .25s ease; }
+  #stripPrev { left: 0; }
+  #stripNext { right: 0; }
+  #stripPrev.off { transform: translateX(-100%); pointer-events: none; }
+  #stripNext.off { transform: translateX(100%); pointer-events: none; }
+  .strip-arrow:focus-visible { outline: 1px solid #fff; outline-offset: -4px; }
+  @media (max-width: 700px) { #poster { --strip-height: 54px; } }
+  @media (prefers-reduced-motion: reduce) { .strip-arrow { transition: none; } }

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Additional Editions</title>
-<link rel="stylesheet" href="collection.css?v=mobile-project-scroll">
+<link rel="stylesheet" href="collection.css?v=collection-picker">
 </head>
 <body>
 
@@ -41,7 +41,9 @@
     <div id="pclip"></div>
     <div id="pui"><div class="guide v" id="gV"></div><div class="guide hz" id="gH"></div></div>
   </div>
-  <div id="strip" role="list" aria-label="Saved images. Drag onto the poster, or tap to place."></div>
+  <button id="stripPrev" class="strip-arrow off" type="button" aria-label="Previous collection images" disabled>←</button>
+  <button id="stripNext" class="strip-arrow" type="button" aria-label="Next collection images">→</button>
+  <div id="strip" role="list" aria-label="Collection images. Drag onto the poster, or tap to place."></div>
 </section>
 <div id="ghost" aria-hidden="true"></div>
 
@@ -103,7 +105,7 @@
   <div id="toast" aria-live="polite"></div>
 </div>
 
-<script src="collection.js?v=watermark-bounds"></script>
+<script src="collection.js?v=collection-picker"></script>
 
 </body>
 </html>
