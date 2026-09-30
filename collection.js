@@ -661,6 +661,16 @@ function addItem(file, fx, fy) {
   const it = { id: pid++, file, x: clamp(fx, w / 2, 1 - w / 2), y: clamp(fy, h / 2, 1 - h / 2), w, h, rot: 0 };
   poster.items.push(it); psel = it.id; renderPoster(); savePoster();
 }
+function clearCanvas() {
+  if (!poster.items.length) return;
+  pushHist();
+  poster.items = []; psel = null;
+  op = null; tdrag = null; ghostEl.style.display = "none";
+  gV.classList.remove("on"); gH.classList.remove("on");
+  saved = []; persist(); dirty = true;
+  renderPoster(); savePoster();
+}
+document.getElementById("clearCanvas").onclick = clearCanvas;
 function deleteSel() {
   if (psel == null || psel === "wm") return;
   pushHist(); poster.items = poster.items.filter(i => i.id !== psel); psel = null; renderPoster(); savePoster();
