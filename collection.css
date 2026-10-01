@@ -241,3 +241,8 @@
   #strip { right: var(--clear-width); }
   #clearCanvas { position: absolute; right: 0; bottom: 0; width: var(--clear-width); height: var(--strip-height); z-index: 5; background: #000; color: #fff; border: 0; border-left: 1px solid #fff; padding: 0 8px; font: 13px/1 var(--face); cursor: pointer; }
   #clearCanvas:hover, #clearCanvas:focus-visible { background: #fff; color: #000; outline: none; }
+
+  @media (max-width: 700px) {
+    #poster { --clear-width: 108px; }
+    #clearCanvas { font-size: 12px; padding: 0 6px; }
+  }
