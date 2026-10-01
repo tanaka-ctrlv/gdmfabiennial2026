@@ -247,3 +247,10 @@
     #poster { --clear-width: 108px; }
     #clearCanvas { font-size: 12px; padding: 0 6px; }
   }
+
+  .poster-page #cv { visibility: hidden; }
+  .poster-page #poster { transition: none; }
+  .poster-loading body::after { content: "Loading exhibition images…"; position: fixed; inset: 0; display: grid; place-items: center; color: #fff; pointer-events: none; }
+
+  .poster-page #label, .poster-page #tab, .poster-page #gallery, .poster-page #about { visibility: hidden; }
+  .poster-loading #bar, .poster-loading #mnav { visibility: hidden; }

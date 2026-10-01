@@ -114,6 +114,8 @@ function layout() {
 
 /* ---------- drawing: one solid block per stack, bands with staggered edges ---------- */
 function drawStack(p, x0, y0, w, h, win = 0) {
+  const bottom = Math.round((y0 + h) * DPR) / DPR;
+  y0 = Math.round(y0 * DPR) / DPR; h = bottom - y0;
   ctx.save(); ctx.beginPath(); ctx.rect(0, y0, W, h); ctx.clip();
   ctx.fillStyle = p.paper; ctx.fillRect(x0 - 6, y0, w + 6, h);
   const R = S.row, n = Math.ceil(h / R);
@@ -256,7 +258,7 @@ function paintBar(p) {
 }
 function setHover(i) {
   if (i === hover) return;
-  paintBar(i >= 0 && mode === "stack" ? pieces[i] : null);
+  paintBar(null);
   if (hover >= 0) pieces[hover].target = 0;
   hover = i;
   if (i >= 0 && mode === "stack") pieces[i].target = 1;
@@ -310,6 +312,42 @@ const gal = document.getElementById("gallery"), frame = document.getElementById(
 const IMG = /\.(png|jpe?g|gif|webp|avif)$/i, VID = /\.(mp4|mov|webm|m4v)$/i;
 const X_SVG = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="0" x2="100" y2="100" stroke="#555" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="100" y1="0" x2="0" y2="100" stroke="#555" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>';
 function srcFor(name) { const n = name.normalize("NFC"); return localFiles.get(n) || IMAGE_DIR + name.split("/").map(encodeURIComponent).join("/"); }
+let posterImagesReady;
+function preloadPosterImages() {
+  if (posterImagesReady) return posterImagesReady;
+  const files = [...new Set(pieces.flatMap(p => [...p.files.filter(f => IMG.test(f)), ...(p.still ? [p.still] : [])]).concat(poster.items.map(it => it.file).filter(f => IMG.test(f))))];
+  let next = 0;
+  const load = file => new Promise(resolve => {
+    const image = new Image();
+    image.onload = async () => {
+      if (image.naturalWidth) aspects.set(file, image.naturalWidth / image.naturalHeight);
+      try { await image.decode(); } catch {}
+      resolve();
+    };
+    image.onerror = () => resolve();
+    image.src = srcFor(file);
+  });
+  const worker = async () => { while (next < files.length) await load(files[next++]); };
+  posterImagesReady = Promise.all(Array.from({ length: 4 }, worker));
+  return posterImagesReady;
+}
+async function openPosterPortal() {
+  if (mode === "busy" || mode === "poster") return;
+  const button = document.getElementById("bPortal"), from = mode;
+  setHover(-1); closeMobileMenu(); mode = "busy";
+  history.pushState(null, "", new URL("poster-portal/", document.baseURI));
+  document.documentElement.classList.add("poster-page", "poster-loading");
+  button.disabled = true; setPortalLabel("Poster Portal");
+  try {
+    await preloadPosterImages();
+    mode = from;
+    await goPoster(true);
+  } finally {
+    document.documentElement.classList.remove("poster-loading");
+    button.disabled = false;
+  }
+}
+addEventListener("popstate", () => location.reload());
 function placeholder(name) { const d = document.createElement("div"); d.className = "ph"; d.innerHTML = X_SVG + "<span></span>"; d.querySelector("span").textContent = name; return d; }
 
 function fillGallery() {
@@ -474,7 +512,7 @@ async function goAbout() {
 }
 document.getElementById("bIndex").onclick = () => location.assign("index/");
 document.getElementById("bAbout").onclick = () => location.assign("about/");
-document.getElementById("bPortal").onclick = () => location.assign("poster-portal/");
+document.getElementById("bPortal").onclick = openPosterPortal;
 
 /* mobile menu: pops up, shrinks when you tap off it */
 const mnav = document.getElementById("mnav"), mBtn = document.getElementById("mMenuBtn");
@@ -484,7 +522,7 @@ document.getElementById("mcatch").addEventListener("pointerdown", e => { e.preve
 document.getElementById("mlist").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const act = b.dataset.act; closeMobileMenu();
-  if (act === "index") location.assign("index/"); else if (act === "about") location.assign("about/"); else if (act === "portal") location.assign("poster-portal/");
+  if (act === "index") location.assign("index/"); else if (act === "about") location.assign("about/"); else if (act === "portal") openPosterPortal();
 });
 
 /* ---------- about background ribbons (decorative, non-interactive) ---------- */
@@ -875,13 +913,14 @@ document.getElementById("saveImg").onclick = async () => {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 };
 
-async function goPoster() {
+async function goPoster(immediate = false) {
   if (mode === "busy" || mode === "poster") return;
   const from = mode; mode = "busy"; setHover(-1); closeMobileMenu();
   if (aboutOpen) { aboutOpen = false; aboutEl.classList.remove("on"); aboutScroll.scrollTop = 0; }
   if (from === "gallery") { frame.querySelectorAll("video").forEach(v => v.pause()); gal.classList.remove("on"); curEl.classList.remove("on"); tabEl.classList.remove("on"); }
+  if (immediate) { V.poster = 1; V.col = 0; V.jut = 0; sel = -1; dirty = true; }
   buildStrip(); posterEl.classList.add("on"); layoutPaper(); renderPoster();
-  await tween("poster", 1, 380);
+  if (!immediate) await tween("poster", 1, 380);
   sel = -1; V.col = 0; V.jut = 0; V.fill = V.fillT = 1; V.savedVis = 0;
   setPortalLabel("Poster Portal"); mode = "poster"; setActive();
 }
@@ -909,5 +948,13 @@ function resize() {
 addEventListener("resize", resize);
 resize(); restore(); setActive();
 if (/\/about(?:\/|\/index\.html)?$/.test(location.pathname) || location.hash === "#about") openAbout();
-if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) goPoster();
+preloadPosterImages();
+if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) {
+  mode = "busy"; V.poster = 1;
+  document.documentElement.classList.add("poster-loading");
+  preloadPosterImages().then(() => {
+    mode = "stack"; goPoster(true);
+    document.documentElement.classList.remove("poster-loading");
+  });
+}
 requestAnimationFrame(render);
