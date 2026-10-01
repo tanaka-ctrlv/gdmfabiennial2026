@@ -333,19 +333,10 @@ function preloadPosterImages() {
 }
 async function openPosterPortal() {
   if (mode === "busy" || mode === "poster") return;
-  const button = document.getElementById("bPortal"), from = mode;
-  setHover(-1); closeMobileMenu(); mode = "busy";
   history.pushState(null, "", new URL("poster-portal/", document.baseURI));
-  document.documentElement.classList.add("poster-page", "poster-loading");
-  button.disabled = true; setPortalLabel("Poster Portal");
-  try {
-    await preloadPosterImages();
-    mode = from;
-    await goPoster(true);
-  } finally {
-    document.documentElement.classList.remove("poster-loading");
-    button.disabled = false;
-  }
+  document.documentElement.classList.add("poster-page");
+  preloadPosterImages();
+  await goPoster(true);
 }
 addEventListener("popstate", () => location.reload());
 function placeholder(name) { const d = document.createElement("div"); d.className = "ph"; d.innerHTML = X_SVG + "<span></span>"; d.querySelector("span").textContent = name; return d; }
@@ -949,12 +940,5 @@ addEventListener("resize", resize);
 resize(); restore(); setActive();
 if (/\/about(?:\/|\/index\.html)?$/.test(location.pathname) || location.hash === "#about") openAbout();
 preloadPosterImages();
-if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) {
-  mode = "busy"; V.poster = 1;
-  document.documentElement.classList.add("poster-loading");
-  preloadPosterImages().then(() => {
-    mode = "stack"; goPoster(true);
-    document.documentElement.classList.remove("poster-loading");
-  });
-}
+if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) goPoster(true);
 requestAnimationFrame(render);
