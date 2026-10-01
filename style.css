@@ -1,265 +1,411 @@
+/* @font-face gives local font files names that the rules below can use. */
 @font-face {
   font-family: "Additional Editions";
   src: url("./Fonts/AdditionalEditions-Regular.woff2") format("woff2");
-  font-weight: 400;
   font-style: normal;
+  font-weight: 400;
+  font-display: swap; /* Show fallback text while the custom font loads. */
+}
+
+/* Secondary text uses the regular Quadrant cut. */
+@font-face {
+  font-family: "Quadrant Text";
+  src: url("./Fonts/QuadrantText-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
   font-display: swap;
 }
 
-:root {
-  --paper: #080808;
-  --ink: #fff;
-  --display-font: "Additional Editions", "Arial Narrow", Impact, sans-serif;
+/* CSS selects this face when font-style: italic is applied to the footer. */
+@font-face {
+  font-family: "Quadrant Text";
+  src: url("./Fonts/QuadrantText-RegularItalic.otf") format("opentype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
 }
 
+/* :root holds reusable custom properties (variables), written with --. */
+:root {
+  --black: #050505;
+  --white: #fff;
+  --display-font: "Additional Editions", Impact, sans-serif;
+  --text-font: "Quadrant Text", Georgia, serif;
+
+  /* Quick adjustments for the design check-in. */
+  /* clamp(minimum, fluid size, maximum); vw is a percent of window width. */
+  --hero-size: clamp(5.5rem, 13.7vw, 18rem);
+  --hero-tracking: -.045em;       /* Negative = tighter title letters. */
+  --row-spacing: 0vh;            /* Positive = desktop rows farther apart. */
+  --panel-edge: clamp(2rem, 5vw, 6rem);   /* How far the soft edge blurs. */
+  --panel-spread: clamp(1.2rem, 3vw, 3.5rem); /* Solid black halo width. */
+  --center-radius: 20vw;         /* Reach of the center darkening. */
+  --footer-radius: 25vw;         /* Larger = footer reveal starts earlier. */
+  --glass-cursor-size: 70px;    /* CHANGE THIS to resize the glass lens. */
+}
+
+/* * selects everything; border-box counts padding inside an element's width. */
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--paper); color: var(--ink); }
+html, body { min-height: 100%; }
+/* var(--name) retrieves one of the custom properties above. */
+body { margin: 0; background: var(--black); color: var(--white); }
 a { color: inherit; }
 
+/* This relative container is the reference for absolutely positioned children. */
 .landing {
+  /* JS writes 0–1 values: center-reveal drives both the oval and View Works. */
+  /* footer-reveal records proximity to the lower-left link for further tuning. */
+  --center-reveal: 0;
+  --footer-reveal: 0;
+  --dim: 0;
   position: relative;
+  isolation: isolate; /* Keep this page's z-index layers together. */
   min-height: 100vh;
-  min-height: 100svh;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--paper);
+  min-height: 100svh; /* Small viewport height handles mobile browser chrome. */
+  overflow: hidden; /* Crop marquee text at the page edges. */
+  background: var(--black);
 }
 
-.about {
+/* All six rows share these rules; each .ribbon--name below sets its position. */
+.ribbon {
   position: absolute;
-  z-index: 4;
-  top: clamp(1.5rem, 4vw, 3.25rem);
-  right: clamp(1.5rem, 7vw, 9rem);
-  font: 1.1rem/1.2 Georgia, serif;
-  text-decoration: none;
+  z-index: 1; /* Behind the hero and the reveal layer. */
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap; /* Keep the marquee on one line. */
+  font: 400 var(--type-size)/1 var(--display-font); /* weight size/leading family */
+  font-synthesis: none;
+  text-transform: uppercase;
+  transform: rotate(var(--angle, 0deg)); /* Optional angle; defaults to zero. */
 }
 
-.about:hover,
-.about:focus-visible,
-.collection-link:hover,
-.collection-link:focus-visible {
-  text-decoration: underline;
+/* top is the vertical position; --offset is its horizontal starting point. */
+/* --speed is one full trip. Change individual sizes/speeds here. */
+/* calc() combines the base position with the shared row-spacing adjustment. */
+.ribbon--one {
+  top: calc(-4% - var(--row-spacing) - var(--row-spacing));
+  --type-size: clamp(5.5rem, 10.7vw, 14rem);
+  --offset: -15vw;
+  --speed: 58s;
+}
+/* Alternate rows have data-direction="right" in the HTML. */
+.ribbon--two {
+  top: calc(17% - var(--row-spacing));
+  --type-size: clamp(10rem, 15vw, 50rem);
+  --offset: -35vw;
+  --speed: 67s;
+}
+.ribbon--three {
+  top: 39%;
+  --type-size: clamp(5.2rem, 10.7vw, 14rem);
+  --offset: -5vw;
+  --speed: 72s;
+}
+.ribbon--four {
+  top: calc(59% + var(--row-spacing));
+  --type-size: clamp(5.3rem, 11.5vw, 15rem);
+  --offset: -34vw;
+  --speed: 63s;
+}
+.ribbon--five {
+  top: calc(75% + var(--row-spacing) + var(--row-spacing));
+  --type-size: clamp(4.7rem, 9.7vw, 12rem);
+  --offset: -9vw;
+  --speed: 69s;
+}
+.ribbon--six {
+  top: calc(91% + var(--row-spacing) + var(--row-spacing) + var(--row-spacing));
+  --type-size: clamp(4.1rem, 8vw, 10rem);
+  --offset: -28vw;
+  --speed: 76s;
 }
 
-/* The central title stays still while its letters respond to the cursor. */
+/* The track carries two identical groups created by JavaScript. */
+.track {
+  display: flex;
+  width: max-content;
+  animation: travel var(--speed) linear infinite; /* Constant, repeating drift. */
+  will-change: transform;
+}
+/* [data-direction="right"] is an attribute selector. */
+.ribbon[data-direction="right"] .track { animation-direction: reverse; }
+.group { display: flex; flex: none; }
+/* A phrase contains the two words; right padding leaves space before repeats. */
+.phrase {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .21em;
+  padding-right: .47em;
+}
+/* -50% moves exactly one of the track's two matching halves across. */
+@keyframes travel {
+  from { transform: translateX(var(--offset)); }
+  to { transform: translateX(calc(-50% + var(--offset))); }
+}
+
+/* JS splits each word into .letter wrappers containing visible .glyph spans. */
+.word { display: inline-flex; align-items: baseline; white-space: nowrap; }
+/* Width change makes nearby letters move aside as one letter squashes. */
+.letter { display: inline-block; flex: none; transition: width .38s cubic-bezier(.2,.7,.2,1); }
+.glyph {
+  display: inline-block;
+  white-space: pre;
+  transform-origin: left center; /* Scale from the left edge. */
+  transition: transform .38s cubic-bezier(.2,.7,.2,1);
+}
+
+/* z-index 2 puts the event information in front of the marquees. */
+.corner {
+  position: absolute;
+  z-index: 2;
+  top: 10.7%;
+  margin: 0;
+  font: 400 clamp(.9rem, 1.12vw, 1.45rem)/1.12 var(--text-font);
+  text-shadow: 0 0 1.2rem var(--black), 0 0 2.4rem var(--black);
+  pointer-events: none; /* Mouse events pass through to moving text behind it. */
+}
+.corner--left { left: 4.7%; }
+.corner--right { right: 7%; }
+
+/* Grid centers the entire title panel within the viewport. */
 .hero {
   position: absolute;
-  z-index: 3;
+  z-index: 2;
   inset: 0;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
-
+/* The solid black rectangle blocks the ribbons behind the central heading. */
+.hero-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(60vw, 300px); /* Take the smaller of these two widths. */
+  min-height: 20vh;
+  border-radius: clamp(1.5rem, 3vw, 4rem);
+  background: var(--black);
+  pointer-events: none;
+  opacity: 0; /* 1 = fully visible; 0 = invisible */
+}
+/* ::before adds a decorative shadow without adding another HTML element. */
+/* Its wide box-shadow creates the soft transition into the moving rows. */
+.hero-panel::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0; /* Short for top/right/bottom/left: 0. */
+  border-radius: inherit;
+  background: var(--black);
+  box-shadow: 0 0 var(--panel-edge) var(--panel-spread) var(--black);
+  pointer-events: none;
+}
+/* Only the heading accepts pointer hits within the otherwise passive panel. */
 .hero-title {
-  margin: -2vh 0 0;
-  max-width: 94vw;
-  text-align: center;
+  position: relative;
+  margin: 0;
+  font: 400 var(--hero-size)/.94 var(--display-font);
+  font-synthesis: none;
   text-transform: uppercase;
-  font-family: var(--display-font);
-  font-size: clamp(3.5rem, 14vw, 17rem);
-  font-weight: 400;
-  font-synthesis-weight: none;
-  line-height: .88;
-  letter-spacing: 0;
-  white-space: nowrap;
+  text-align: center;
+  letter-spacing: var(--hero-tracking);
   pointer-events: auto;
 }
+.hero-title .word { display: flex; justify-content: center; width: max-content; margin-inline: auto; }
+/* + selects only a .word immediately after another .word: the second line. */
+.hero-title .word + .word { margin-top: .08em; }
+/* The margins supply tracking after JS gives each letter a measured width. */
+.hero-title .letter:not(:last-child) { margin-right: var(--hero-tracking); }
 
-.hero-title a {
-  display: block;
-  padding: .08em .12em;
-  background: var(--paper);
-  text-decoration: none;
+/* The broad veil darkens the whole composition near either reveal target. */
+.proximity-dim {
+  position: absolute; /* Place this layer over the landing composition. */
+  z-index: 3; /* Above the title and rows, below the links at z-index 4. */
+  inset: 0; /* Stretch the layer to all four edges of .landing. */
+  background: rgb(0 0 0 / 72%); /* Darken the whole page, but keep some type visible. */
+  opacity: var(--dim); /* JS supplies 0 (clear) through 1 (strongest dim). */
+  pointer-events: none; /* This visual layer never blocks clicking or hovering. */
+  transition: opacity .8s ease-in-out; /* Take .4 seconds to fade either way. */
 }
 
-.hero-title .word { display: block; }
-.hero-title .word + .word { margin-top: .09em; }
-
-/* Staggered ribbons form courses of larger and smaller type. */
-.ribbon {
-  position: absolute;
-  z-index: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  transform: rotate(var(--angle, 0deg));
-  font-family: var(--display-font);
-  font-size: var(--type-size, clamp(4rem, 10.5vw, 12rem));
-  font-weight: 400;
-  line-height: 1;
-  font-synthesis-weight: none;
-  letter-spacing: 0;
-  text-transform: uppercase;
+/* ::after creates an extra visual layer without adding another HTML element. */
+/* It makes an oval of solid black inside the broader 72% veil. */
+.proximity-dim::after {
+  content: ""; /* Required to make the ::after pseudo-element exist. */
+  position: absolute; /* Position the oval within .proximity-dim. */
+  inset: 0; /* Give the gradient the full page to draw into. */
+  background: radial-gradient(
+    ellipse 27vw 26vh at 50% 54%, /* Oval size and its center point. */
+    #000 0%,     /* Solid black at the middle. */
+    #000 50%,    /* Keep the inner half solid black. */
+    transparent 100% /* Fade the outer half to transparent. */
+  );
+  opacity: var(--center-reveal); /* JS raises this from 0 to 1 near View Works. */
+  transition: opacity .8s ease-in-out; /* Match the text's fade duration. */
 }
 
-.track {
-  display: flex;
-  width: max-content;
-  animation: travel var(--speed, 30s) linear infinite;
-  will-change: transform;
-}
-
-.ribbon[data-direction="right"] .track {
-  animation-direction: reverse;
-}
-
-.ribbon:hover .track {
-  animation-play-state: paused;
-}
-
-.group {
-  display: flex;
-  flex: none;
-  align-items: center;
-}
-
-.phrase {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .22em;
-  padding-right: .48em;
-}
-
-/* Change --type-size for each row; --offset controls its stagger. */
-.ribbon--top {
-  top: -3%;
-  left: 0;
-  width: 100%;
-  --type-size: clamp(5rem, 11vw, 13rem);
-  --offset: -4vw;
-  --angle: 0deg;
-  --speed: 36s;
-}
-
-.ribbon--upper {
-  top: 17%;
-  left: 0;
-  width: 100%;
-  --type-size: clamp(4rem, 8vw, 9.5rem);
-  --offset: -32vw;
-  --angle: 0deg;
-  --speed: 29s;
-}
-
-.ribbon--left {
-  top: 42%;
-  left: -10%;
-  width: 36%;
-  --type-size: clamp(4.5rem, 9.5vw, 11rem);
-  --offset: -6vw;
-  --angle: 0deg;
-  --speed: 34s;
-}
-
-.ribbon--right {
-  top: 48%;
-  left: 78%;
-  width: 34%;
-  --type-size: clamp(5rem, 12vw, 14rem);
-  --offset: -22vw;
-  --angle: 0deg;
-  --speed: 40s;
-}
-
-.ribbon--lower {
-  top: 72%;
-  left: 0;
-  width: 100%;
-  --type-size: clamp(4.5rem, 10vw, 12rem);
-  --offset: -30vw;
-  --angle: 0deg;
-  --speed: 31s;
-}
-
-.ribbon--bottom {
-  top: 89%;
-  left: 0;
-  width: 100%;
-  --type-size: clamp(3.5rem, 7vw, 8.5rem);
-  --offset: -5vw;
-  --angle: 0deg;
-  --speed: 37s;
-}
-
-@keyframes travel {
-  from { transform: translateX(var(--offset, 0px)); }
-  to { transform: translateX(calc(-50% + var(--offset, 0px))); }
-}
-
-/* Changing each letter's width moves its neighboring letters too. */
-.word {
-  display: inline-flex;
-  align-items: baseline;
-  cursor: pointer;
-}
-
-.letter {
-  display: inline-block;
-  flex: none;
-  transition: width .44s cubic-bezier(.18, .72, .19, 1.04);
-}
-
-.glyph {
-  display: inline-block;
-  white-space: pre;
-  transform-origin: left center;
-  transition: transform .44s cubic-bezier(.18, .72, .19, 1.04);
-}
-
-.collection-link {
+/* The comma lets both links share the same positioning and type rules. */
+.view-works,
+.footer-link {
   position: absolute;
   z-index: 4;
-  bottom: clamp(1.8rem, 5vw, 4rem);
+  font-family: var(--text-font);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .15em;
+}
+/* translate(-50%, -50%) centers the link around its 50%/54% point. */
+.view-works {
+  top: 54%;
   left: 50%;
-  transform: translateX(-50%);
-  font: 1.1rem/1.2 Georgia, serif;
-  padding: .2rem .75rem;
-  background: var(--paper);
+  transform: translate(-50%, -50%);
+  font-size: clamp(1.3rem, 1.65vw, 2rem);
   white-space: nowrap;
+  opacity: 1; /* Accessible fallback before JS enables the reveal. */
+  pointer-events: auto;
+  transition: opacity .8s ease-in-out; /* Match both black layers' fade duration. */
+}
+/* JS adds has-proximity on fine-pointer devices, enabling the cursor reveal. */
+.landing.has-proximity .view-works {
+  opacity: var(--center-reveal); /* Same 0–1 value as the oval. */
+  pointer-events: none; /* Prevent a hidden link from catching mouse clicks. */
+}
+/* Once sufficiently visible, mouse clicks reach the link; focus-visible handles Tab. */
+.landing.center-active .view-works,
+.view-works:focus-visible { pointer-events: auto; }
+/* The lower-left link requests the italic cut of Quadrant Text. */
+.footer-link {
+  bottom: 7.7%;
+  left: 4.6%;
+  font-size: clamp(1.15rem, 1.58vw, 2rem);
+  font-style: italic;
+  line-height: 1.06;
   text-decoration: none;
+  text-shadow: 0 0 1rem var(--black), 0 0 2rem var(--black);
+}
+.footer-link:hover,
+.footer-link:focus-visible { text-decoration: underline; }
+
+/* Media queries change rules only under the conditions in parentheses. */
+/* On touch devices, the destination remains visible and tappable. */
+@media (hover: none), (pointer: coarse) {
+  .view-works { opacity: 1; pointer-events: auto; }
+  .proximity-dim { display: none; }
 }
 
-@media (max-width: 650px) {
-  .ribbon--top {
-    top: 10%;
-    left: 0;
-    width: 100%;
-    --type-size: clamp(3.5rem, 17vw, 6.5rem);
-  }
-
-  .ribbon--upper,
-  .ribbon--left,
-  .ribbon--right {
-    display: none;
-  }
-
-  .ribbon--lower {
-    top: 70%;
-    left: 0;
-    width: 100%;
-    --type-size: clamp(3rem, 13vw, 5.5rem);
-  }
-
-  .ribbon--bottom {
-    top: 84%;
-    left: 0;
-    width: 100%;
-    --type-size: clamp(3.25rem, 15vw, 6rem);
-  }
-
-  .hero-title {
-    font-size: clamp(3rem, 13vw, 6rem);
-  }
-
-  .about {
-    top: 1.5rem;
-    right: 1.5rem;
-  }
+/* Narrow screens use smaller type and reposition the rows and links. */
+@media (max-width: 700px) {
+  :root { --hero-size: clamp(2.9rem, 12.5vw, 6.5rem); }
+  .hero-panel { width: 86vw; min-height: 30vh; }
+  .ribbon--one { top: 2%; --type-size: 17vw; }
+  .ribbon--two { top: 18%; --type-size: 13vw; }
+  .ribbon--three { top: 35%; --type-size: 16vw; }
+  .ribbon--four { top: 57%; --type-size: 16vw; }
+  .ribbon--five { top: 74%; --type-size: 14vw; }
+  .ribbon--six { top: 89%; --type-size: 13vw; }
+  .corner { top: 10%; font-size: clamp(.7rem, 2.3vw, 1rem); }
+  .corner--left { left: 5%; }
+  .corner--right { right: 5%; text-align: right; }
+  .footer-link { left: 5%; bottom: 6%; }
+  .view-works { top: 52%; }
 }
 
+/* Respect the visitor's operating-system reduced-motion preference. */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .track { animation: none !important; }
-  .letter, .glyph { transition: none; }
+  .track { animation: none; }
+  .letter, .glyph, .proximity-dim, .proximity-dim::after, .view-works { transition: none; }
+}
+
+/* GLASS CURSOR ------------------------------------------------------------ */
+/* JS adds has-glass-cursor only when a fine mouse or trackpad is in use. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.has-glass-cursor,
+  html.has-glass-cursor * { cursor: none !important; }
+}
+
+/* The lens is fixed to the viewport. JS moves its transform with the pointer. */
+.glass-cursor {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: var(--glass-cursor-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none; /* The real page still receives hover and click events. */
+  opacity: 0;
+  transform: translate3d(-300px, -300px, 0) translate(-50%, -50%);
+  transition: opacity .18s ease;
+  -webkit-mask-image: radial-gradient(circle, #000 0 90%, transparent 80%);
+  mask-image: radial-gradient(circle, #000 0 90%, transparent 80%);
+  border: 0;              /* Remove the sharp circular outline. */
+  filter: blur(1px);      /* Blur the visible edge. */
+
+  /* The content underneath remains visible with a slight optical softness. */
+  -webkit-backdrop-filter: blur(1.6px) contrast(1.45) saturate(1.7);
+  backdrop-filter: blur(1.6px) contrast(1.45) saturate(1.7);
+  background:
+    radial-gradient(circle at 43% 19%, rgb(255 255 255 / 32%), transparent 23%),
+    radial-gradient(circle, transparent 0 43%, rgb(4 25 95 / 16%) 59%,
+      rgb(1 11 58 / 32%) 77%, rgb(0 0 0 / 7%) 100%);
+  border: 1px solid rgb(225 247 255 / 65%);
+  box-shadow:
+    inset 0 6px 8px -4px rgb(255 255 255 / 80%),
+    inset 0 -12px 14px -9px rgb(18 119 255 / 90%),
+    inset -9px 0 12px -10px rgb(255 140 44 / 90%),
+    0 0 0 1px rgb(45 119 255 / 35%),
+    0 0 23px rgb(9 70 220 / 22%);
+}
+
+.glass-cursor.is-visible { opacity: 1; }
+
+/* A thin conic rainbow becomes the chromatic edge of the glass. */
+.glass-cursor::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--glass-angle, 210deg),
+    #0b4fb9, #00bfff 14%, #eaffff 24%, #fb972d 34%,
+    #08186e 52%, #27d7ff 70%, #fff0c9 82%, #e77b25 91%, #0b4fb9
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent 0 81%, #000 86% 96%, transparent 100%);
+  mask: radial-gradient(farthest-side, transparent 0 81%, #000 86% 96%, transparent 100%);
+  filter: blur(1px) saturate(1.5);
+  opacity: .95;
+}
+
+/* Two inner arcs suggest light bending through a rounded lens. */
+.glass-cursor::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 27%, transparent 0 53%,
+      rgb(255 151 44 / 90%) 58%, rgb(42 231 255 / 93%) 63%,
+      rgb(30 65 232 / 80%) 69%, transparent 77%),
+    radial-gradient(ellipse at 50% 80%, transparent 0 61%,
+      rgb(10 205 255 / 65%) 67%, rgb(255 126 37 / 85%) 73%, transparent 82%);
+  filter: blur(1px);
+  opacity: .8;
+}
+
+/* The small center glint nods to the concentric reflection in the reference. */
+.glass-cursor__core {
+  position: absolute;
+  inset: 39%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 18%, #fff 0 7%, #39dfff 10%, transparent 28%),
+    radial-gradient(circle at 50% 70%, transparent 0 38%,
+      #f7a246 44%, #35d9ff 49%, transparent 60%);
+  box-shadow: 0 0 11px rgb(10 146 255 / 35%);
+  opacity: .8;
+}
+
+/* Touch and reduced-motion visitors retain the ordinary system cursor. */
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .glass-cursor { display: none; }
 }

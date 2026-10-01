@@ -1,142 +1,54 @@
 <!doctype html>
+<!-- The doctype tells the browser to use modern HTML; lang helps assistive technology. -->
 <html lang="en">
 <head>
+  <!-- UTF-8 supports punctuation such as the en dash in the dates. -->
   <meta charset="utf-8">
+  <!-- Make CSS viewport units and the mobile layout use the device width. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Additional Editions</title>
-  <link rel="stylesheet" href="./style.css?v=exhibition-no-arrow">
+  <!-- This appears in the browser tab. -->
+  <title>Additional Editions — RISD Biennial 2026</title>
+  <!-- The ?v=1 query can be increased after edits to refresh a cached file. -->
+  <link rel="stylesheet" href="./style.css?v=1">
+  <!-- defer waits until the HTML has been parsed before running the script. -->
+  <script src="./script.js?v=1" defer></script>
 </head>
 <body>
+  <!-- main identifies the primary content; landing is the positioning container. -->
   <main class="landing">
+    <!-- Each ribbon is a separate row; script.js fills its empty track with text. -->
+    <!-- data-direction="right" reverses the direction of alternate rows in CSS. -->
+    <!-- aria-hidden keeps repeated decorative text out of screen-reader navigation. -->
+    <div class="ribbon ribbon--one" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--two" data-direction="right" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--three" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--four" data-direction="right" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--five" aria-hidden="true"><div class="track"></div></div>
+    <div class="ribbon ribbon--six" data-direction="right" aria-hidden="true"><div class="track"></div></div>
 
-    <!-- Decorative repetitions are hidden from screen readers. -->
-    <div class="ribbon ribbon--top" aria-hidden="true"><div class="track"></div></div>
-    <div class="ribbon ribbon--upper" data-direction="right" aria-hidden="true"><div class="track"></div></div>
-    <div class="ribbon ribbon--left" aria-hidden="true"><div class="track"></div></div>
-    <div class="ribbon ribbon--right" data-direction="right" aria-hidden="true"><div class="track"></div></div>
-    <div class="ribbon ribbon--lower" data-direction="right" aria-hidden="true"><div class="track"></div></div>
-    <div class="ribbon ribbon--bottom" aria-hidden="true"><div class="track"></div></div>
+    <!-- p is ordinary informational text; br makes the intended line breaks. -->
+    <p class="corner corner--left">Graphic Design<br>MFA Biennial,<br>RISD 2026.</p>
+    <p class="corner corner--right">Sol Koffler Gallery<br>10/01/26–10/18/26</p>
 
+    <!-- The foreground panel covers the rows. h1 is the page's main heading. -->
+    <!-- Each word has its own span so JS can deform its letters independently. -->
     <div class="hero">
-      <h1 class="hero-title">
-        <a href="index/" aria-label="Additional Editions — enter the exhibition">
-          <span class="word" aria-hidden="true">Additional</span>
-          <span class="word" aria-hidden="true">Editions</span>
-        </a>
-      </h1>
+      <div class="hero-panel">
+        <h1 class="hero-title">
+          <span class="word">Additional</span>
+          <span class="word">Editions</span>
+        </h1>
+      </div>
     </div>
 
-    <a class="collection-link" href="index/">Enter the Exhibition</a>
+    <!-- JS changes this layer's opacity near either reveal target. -->
+    <!-- It sits above the composition but below the two clickable links. -->
+    <div class="proximity-dim" aria-hidden="true"></div>
+
+    <!-- a creates a link; href is its destination. Replace these placeholder URLs. -->
+    <!-- View Works fades in near the center; the lower-left link stays visible. -->
+    <a class="view-works" href="index/">view works</a>
+    <a class="footer-link" href="about.html">Additional<br>Editions</a>
   </main>
-
-  <script>
-    document.addEventListener('click', (event) => {
-      if (event.target.closest('a')) return;
-      window.location.assign('index/');
-    });
-
-    // Build two identical groups for each strip so the marquee can loop.
-    document.querySelectorAll('.ribbon .track').forEach((track) => {
-      const group = document.createElement('span');
-      group.className = 'group';
-
-      for (let i = 0; i < 3; i++) {
-        const phrase = document.createElement('span');
-        phrase.className = 'phrase';
-        phrase.innerHTML = '<span class="word">Additional</span><span class="word">Editions</span>';
-        group.append(phrase);
-      }
-
-      track.append(group, group.cloneNode(true));
-    });
-
-    // Increase or decrease these values to tune the hover response.
-    const WAVE_RADIUS = 1.6;
-    const CENTER_SQUEEZE = .9;
-    const SIDE_STRETCH = 1.2;
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    if (!reduceMotion.matches) {
-      document.fonts.ready.then(() => {
-        document.querySelectorAll('.word').forEach((word) => {
-          const letters = [...word.textContent].map((character) => {
-            const letter = document.createElement('span');
-            const glyph = document.createElement('span');
-
-            letter.className = 'letter';
-            glyph.className = 'glyph';
-            glyph.textContent = character;
-            letter.append(glyph);
-
-            return letter;
-          });
-
-          word.replaceChildren(...letters);
-
-          const measure = () => {
-            letters.forEach((letter) => {
-              letter.style.width = '';
-              letter.firstElementChild.style.width = '';
-              letter.firstElementChild.style.transform = '';
-            });
-
-            letters.forEach((letter) => {
-              const glyph = letter.firstElementChild;
-              const width = glyph.getBoundingClientRect().width;
-
-              letter.dataset.base = width;
-              letter.style.width = `${width}px`;
-              glyph.style.width = `${width}px`;
-            });
-          };
-
-          measure();
-          window.addEventListener('resize', measure);
-
-          word.addEventListener('pointermove', (event) => {
-            const radius =
-              parseFloat(getComputedStyle(word).fontSize) * WAVE_RADIUS;
-
-            const centers = letters.map((letter) => {
-              const box = letter.getBoundingClientRect();
-              return box.left + box.width / 2;
-            });
-
-            letters.forEach((letter, index) => {
-              const distance =
-                Math.abs(event.clientX - centers[index]) / radius;
-
-              const squeeze =
-                Math.exp(-Math.pow(distance / .32, 2));
-
-              const stretch =
-                Math.exp(-Math.pow((distance - .72) / .48, 2));
-
-              const scale = Math.max(
-                .18,
-                Math.min(
-                  2.3,
-                  1 - CENTER_SQUEEZE * squeeze + SIDE_STRETCH * stretch
-                )
-              );
-
-              const base = Number(letter.dataset.base);
-
-              letter.style.width = `${base * scale}px`;
-              letter.firstElementChild.style.transform = `scaleX(${scale})`;
-            });
-          });
-
-          word.addEventListener('pointerleave', () => {
-            letters.forEach((letter) => {
-              letter.style.width = `${letter.dataset.base}px`;
-              letter.firstElementChild.style.transform = 'scaleX(1)';
-            });
-          });
-        });
-      });
-    }
-  </script>
 </body>
 </html>
