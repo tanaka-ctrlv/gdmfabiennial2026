@@ -578,6 +578,7 @@ function contentFor(file, dark) {
   } else { const ph = document.createElement("div"); ph.className = "ph2"; ph.innerHTML = X_DARK; wrap.append(ph); }
   return wrap;
 }
+const clearCanvasButton = document.getElementById("clearCanvas");
 function buildStrip() {
   stripEl.innerHTML = "";
   const list = pieces.map(p => ({ title: p.title, artist: p.artist, file: p.still && (VID.test(p.files[0]) || /\.gif$/i.test(p.files[0])) ? p.still : p.files[0] }));
@@ -589,6 +590,7 @@ function buildStrip() {
     else b.innerHTML = X_DARK;
     stripEl.append(b);
   });
+  stripEl.append(clearCanvasButton);
   requestAnimationFrame(updateStripArrows);
 }
 function layoutPaper() {
