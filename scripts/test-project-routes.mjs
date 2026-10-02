@@ -17,7 +17,7 @@ for (const [i, entry] of entries.entries()) {
   const html = read(`${slug}/index.html`);
   assert.ok(html.includes('<base href="../">'));
   assert.ok(html.includes('project-routes.js?v=artist-urls'));
-  assert.ok(html.includes('collection.js?v=artist-urls'));
+  assert.ok(html.includes('collection.js?v=artist-hover-images'));
 }
 assert.equal(ProjectRoutes.projectIndex(entries, '/missing'), -1);
 assert.equal(ProjectRoutes.slugForArtist('Tanaka Mapondera'), 'tanaka-mapondera');

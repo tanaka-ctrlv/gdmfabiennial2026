@@ -119,9 +119,9 @@
     .pitem .h, .pitem .rot, .pitem .del, .guide { display: none !important; }
   }
 
-  /* selected stack tab */
-  #tab { position: fixed; left: 0; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 0; white-space: nowrap; line-height: 1; pointer-events: none; opacity: 0; transition: opacity .2s ease; box-sizing: border-box; }
-  #tab.on { opacity: 1; }
+  /* Artist names on the selected and previewed stack tabs. */
+  #tab, #hoverTab { position: fixed; left: 0; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 0; white-space: nowrap; line-height: 1; pointer-events: none; opacity: 0; transition: opacity .2s ease; box-sizing: border-box; }
+  #tab.on, #hoverTab.on { opacity: 1; }
 
   /* gallery */
   #gallery { position: fixed; top: 0; bottom: var(--barH); left: var(--gl); right: 0; z-index: 3; display: grid;
@@ -256,4 +256,6 @@
   .poster-page #cv { visibility: hidden; }
   .poster-page #poster { transition: none; }
 
-  .poster-page #label, .poster-page #tab, .poster-page #gallery, .poster-page #about { visibility: hidden; }
+  .poster-page #label, .poster-page #tab, .poster-page #hoverTab, .poster-page #gallery, .poster-page #about { visibility: hidden; }
+
+#tab, #hoverTab { overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
