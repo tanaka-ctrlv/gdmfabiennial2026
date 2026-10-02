@@ -342,7 +342,49 @@ async function openPosterPortal() {
   preloadPosterImages();
   await goPoster(true);
 }
-addEventListener("popstate", () => location.reload());
+/* Update the address while keeping the existing gallery animations. */
+const siteBase = new URL(document.baseURI);
+let applyingRoute = false;
+let routeVersion = 0;
+function projectAtLocation() {
+  return ProjectRoutes.projectIndex(ENTRIES, location.pathname, siteBase.pathname);
+}
+function setProjectAddress(index) {
+  if (applyingRoute) return;
+  const path = index >= 0 ? ProjectRoutes.slugForArtist(ENTRIES[index].artist) : "index/";
+  const url = new URL(path, siteBase);
+  if (location.pathname !== url.pathname) history.pushState(null, "", url);
+  document.title = index >= 0
+    ? `${ENTRIES[index].artist} — ${ENTRIES[index].title} — Additional Editions`
+    : "Additional Editions";
+}
+async function applyLocation() {
+  const version = ++routeVersion;
+  // A Back/Forward click can arrive while a tween is still running.
+  while (mode === "busy") {
+    await new Promise(resolve => setTimeout(resolve, 20));
+    if (version !== routeVersion) return;
+  }
+  const index = projectAtLocation();
+  const isIndex = location.pathname === new URL("index/", siteBase).pathname
+    || location.pathname === new URL("index/index.html", siteBase).pathname;
+  if (index < 0 && !isIndex) { location.reload(); return; }
+  applyingRoute = true;
+  try {
+    if (mode === "poster") await leavePoster();
+    if (index >= 0) {
+      if (mode === "gallery") await switchArtist(index);
+      else await openGallery(index);
+    } else {
+      if (mode === "gallery") await closeGallery();
+      if (aboutOpen) closeAbout();
+    }
+    document.title = index >= 0
+      ? `${ENTRIES[index].artist} — ${ENTRIES[index].title} — Additional Editions`
+      : "Additional Editions";
+  } finally { applyingRoute = false; }
+}
+addEventListener("popstate", applyLocation);
 function placeholder(name) { const d = document.createElement("div"); d.className = "ph"; d.innerHTML = X_SVG + "<span></span>"; d.querySelector("span").textContent = name; return d; }
 
 function fillGallery() {
@@ -396,6 +438,7 @@ document.getElementById("nextI").onclick = () => showImage(imgIdx + 1);
 async function openGallery(i) {
   if (mode !== "stack") return;
   mode = "busy"; setHover(-1); sel = i;
+  setProjectAddress(i);
   if (aboutOpen) { aboutOpen = false; aboutEl.classList.remove("on"); aboutScroll.scrollTop = 0; }
   pieces.forEach(p => p.target = 0);
   V.fillT = 1;
@@ -412,6 +455,7 @@ async function openGallery(i) {
 }
 async function closeGallery() {
   if (mode !== "gallery") return;
+  setProjectAddress(-1);
   mode = "busy";
   frame.querySelectorAll("video").forEach(v => v.pause());
   gal.classList.remove("on"); curEl.classList.remove("on");
@@ -427,6 +471,7 @@ async function closeGallery() {
 }
 async function switchArtist(i) {
   if (mode !== "gallery" || i === sel) return;
+  setProjectAddress(i);
   mode = "busy";
   gal.style.transition = "opacity .15s ease"; gal.classList.remove("on");
   await tween("jut", 0, 160);
@@ -504,7 +549,9 @@ async function goAbout() {
   else if (mode === "gallery") { await closeGallery(); openAbout(); }
   else if (mode === "stack") openAbout();
 }
-document.getElementById("bIndex").onclick = () => location.assign("index/");
+document.getElementById("bIndex").onclick = () => {
+  if (mode === "gallery") closeGallery(); else location.assign("index/");
+};
 document.getElementById("bAbout").onclick = () => location.assign("about/");
 document.getElementById("bPortal").onclick = openPosterPortal;
 
@@ -516,7 +563,7 @@ document.getElementById("mcatch").addEventListener("pointerdown", e => { e.preve
 document.getElementById("mlist").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const act = b.dataset.act; closeMobileMenu();
-  if (act === "index") location.assign("index/"); else if (act === "about") location.assign("about/"); else if (act === "portal") openPosterPortal();
+  if (act === "index") { if (mode === "gallery") closeGallery(); else location.assign("index/"); } else if (act === "about") location.assign("about/"); else if (act === "portal") openPosterPortal();
 });
 
 /* ---------- about background ribbons (decorative, non-interactive) ---------- */
@@ -945,3 +992,5 @@ if (/\/about(?:\/|\/index\.html)?$/.test(location.pathname) || location.hash ===
 preloadPosterImages();
 if (/\/poster-portal(?:\/|\/index\.html)?$/.test(location.pathname)) goPoster(true);
 requestAnimationFrame(render);
+
+if (projectAtLocation() >= 0) applyLocation();
