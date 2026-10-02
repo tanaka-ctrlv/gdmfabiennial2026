@@ -347,6 +347,7 @@ function placeholder(name) { const d = document.createElement("div"); d.classNam
 
 function fillGallery() {
   gal.scrollTop = 0;
+  gal.querySelector(".g-content").scrollTop = 0;
   const p = pieces[sel];
   document.getElementById("gTitle").textContent = p.title;
   document.getElementById("gArtist").textContent = p.artist;
@@ -354,7 +355,6 @@ function fillGallery() {
   document.getElementById("gDate").textContent = p.date;
   document.getElementById("gDesc").textContent = p.description || "";
   const gd = document.getElementById("gDesc"); gd.scrollTop = 0;
-  requestAnimationFrame(() => { gd.classList.toggle("more", gd.scrollHeight > gd.clientHeight + 2); gd.classList.remove("end"); });
   tabEl.textContent = `No.${p.idx + 1}`;
   stage.classList.toggle("navable", p.files.length > 1);
   showImage(0);
@@ -376,7 +376,6 @@ function showImage(k) {
   } else frame.append(placeholder(name));
   document.getElementById("gCount").textContent = `${imgIdx + 1}/${n}`;
 }
-document.getElementById("gDesc").addEventListener("scroll", e => { const g = e.target; g.classList.toggle("end", g.scrollTop + g.clientHeight >= g.scrollHeight - 2); });
 /* the photo's bounding box: left half = PREVIOUS cursor, right half = NEXT cursor */
 function stageSide(e) { const r = stage.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? -1 : 1; }
 stage.addEventListener("pointermove", e => {

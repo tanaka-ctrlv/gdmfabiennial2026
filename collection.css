@@ -125,11 +125,17 @@
 
   /* gallery */
   #gallery { position: fixed; top: 0; bottom: var(--barH); left: var(--gl); right: 0; z-index: 3; display: grid;
-    grid-template-columns: minmax(170px, 1fr) minmax(0, 2.75fr); grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas: "head count" "head stage" "tools desc";
+    grid-template-columns: minmax(170px, 1fr) minmax(0, 2.75fr); grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "head content" "tools content";
     column-gap: clamp(24px, 3.6vw, 60px); padding: calc(38px + env(safe-area-inset-top, 0px)) clamp(16px, 6.6vw, 96px) clamp(24px, 5vh, 56px) 0;
     opacity: 0; pointer-events: none; transition: opacity .25s ease; }
   #gallery.on { opacity: 1; pointer-events: auto; }
+  .g-content { grid-area: content; min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: contain; scrollbar-width: none; display: grid; grid-template-areas: "count" "stage" "desc"; grid-template-rows: max-content max-content max-content; align-content: start; }
+  .g-content::-webkit-scrollbar { display: none; }
+  .g-content:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+  @media (min-width: 701px) {
+    .g-content .g-stage { height: max(240px, calc(100svh - var(--barH) - 250px)); }
+  }
   .g-head { grid-area: head; align-self: start; min-width: 0; }
   #gTitle { margin: 0; font-weight: 400; font-size: clamp(26px, 3vw, 44px); line-height: 1.05; text-wrap: balance; --outline: 2px; }
   #gArtist { display: block; margin-top: 12px; font-size: clamp(16px, 1.6vw, 23px); }
@@ -150,10 +156,8 @@
   .ph { position: absolute; inset: 0; background: #d9d9d9; display: grid; place-items: center; }
   .ph svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .ph span { position: relative; background: #d9d9d9; padding: 6px 12px; color: #555; font-size: 14px; text-align: center; max-width: 70%; word-break: break-word; text-shadow: none; }
-  #gDesc { grid-area: desc; margin-top: clamp(18px, 3.6vh, 40px); font-size: clamp(14px, 1.15vw, 17px); line-height: 1.38; max-width: 46em; max-height: clamp(64px, 12vh, 120px); overflow-y: auto; scrollbar-width: none; white-space: pre-line; }
+  #gDesc { grid-area: desc; margin-top: clamp(18px, 3.6vh, 40px); font-size: clamp(14px, 1.15vw, 17px); line-height: 1.38; max-width: 46em; max-height: none; overflow: visible; scrollbar-width: none; white-space: pre-line; }
   #gDesc::-webkit-scrollbar { display: none; }
-  #gDesc.more { -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
-  #gDesc.more.end { -webkit-mask-image: none; mask-image: none; }
   #cur { position: fixed; z-index: 20; left: 0; top: 0; pointer-events: none; color: #fff; font-size: 16px; letter-spacing: .01em; transform: translate(-50%, -50%); opacity: 0; transition: opacity .12s ease; white-space: nowrap; --outline: 1px; }
   #cur.on { opacity: 1; }
 
@@ -197,6 +201,7 @@
   #toast { color: #fff; min-height: 1em; font-size: 13px; }
 
   @media (max-width: 700px) {
+    .g-content { display: contents; }
     #gallery { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: max-content 56vh max-content max-content; grid-template-areas: "head head" "stage stage" "count tools" "desc desc";
       column-gap: 14px; padding: calc(48px + env(safe-area-inset-top, 0px)) 16px 28px 0; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; overscroll-behavior-y: contain; box-sizing: border-box; align-content: start; }
     .g-head { padding-bottom: 18px; }
